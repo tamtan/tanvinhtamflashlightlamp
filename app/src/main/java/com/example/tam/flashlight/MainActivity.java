@@ -81,6 +81,11 @@ public class MainActivity extends AppCompatActivity {
         if (mAdView != null) {
             mAdView.resume();
         }
+        try {
+            cameraObj = Camera.open();
+        } catch (RuntimeException e) {
+
+        }
     }
 
     @Override
