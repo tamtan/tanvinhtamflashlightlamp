@@ -19,15 +19,15 @@ public class MainActivity extends AppCompatActivity {
     boolean isOn;
     private AdView mAdView;
     private Camera cameraObj;
-    InterstitialAd mInterstitialAd;
+//    InterstitialAd mInterstitialAd;
 
-    private void requestNewInterstitial() {
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("SEE_YOUR_LOGCAT_TO_GET_YOUR_DEVICE_ID")
-                .build();
-
-        mInterstitialAd.loadAd(adRequest);
-    }
+//    private void requestNewInterstitial() {
+//        AdRequest adRequest = new AdRequest.Builder()
+//                .addTestDevice("SEE_YOUR_LOGCAT_TO_GET_YOUR_DEVICE_ID")
+//                .build();
+//
+//        mInterstitialAd.loadAd(adRequest);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,20 +37,20 @@ public class MainActivity extends AppCompatActivity {
         // values/strings.xml.
 //        interstital advs
 
-        mInterstitialAd = new InterstitialAd(this);
+//        mInterstitialAd = new InterstitialAd(this);
 //        sample
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+//        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
 //        real
 //        mInterstitialAd.setAdUnitId("ca-app-pub-8770421762757862/3849421438");
 
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                requestNewInterstitial();
-            }
-        });
-
-        requestNewInterstitial();
+//        mInterstitialAd.setAdListener(new AdListener() {
+//            @Override
+//            public void onAdClosed() {
+//                requestNewInterstitial();
+//            }
+//        });
+//
+//        requestNewInterstitial();
 
         //banner advs
         mAdView = (AdView) findViewById(R.id.ad_view);
@@ -71,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
             tvTurnButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mInterstitialAd.isLoaded()) {
-                        mInterstitialAd.show();
-                    }
+//                    if (mInterstitialAd.isLoaded()) {
+//                        mInterstitialAd.show();
+//                    }
                     if (isOn) {
                         isOn = false;
                         Camera.Parameters cameraParams = cameraObj.getParameters();
