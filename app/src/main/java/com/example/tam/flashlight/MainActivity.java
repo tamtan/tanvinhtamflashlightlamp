@@ -9,14 +9,25 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 
 public class MainActivity extends AppCompatActivity {
     RelativeLayout tvTurnButton;
     boolean isOn;
     private AdView mAdView;
     private Camera cameraObj;
+    InterstitialAd mInterstitialAd;
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("SEE_YOUR_LOGCAT_TO_GET_YOUR_DEVICE_ID")
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +35,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         // Gets the ad view defined in layout/ad_fragment.xml with ad unit ID set in
         // values/strings.xml.
+//        interstital advs
+
+        mInterstitialAd = new InterstitialAd(this);
+//        sample
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+//        real
+//        mInterstitialAd.setAdUnitId("ca-app-pub-8770421762757862/3849421438");
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+            }
+        });
+
+        requestNewInterstitial();
+
+        //banner advs
         mAdView = (AdView) findViewById(R.id.ad_view);
 
         // Create an ad request. Check your logcat output for the hashed device ID to
@@ -38,11 +67,13 @@ public class MainActivity extends AppCompatActivity {
         final PackageManager packageManager = MainActivity.this.getPackageManager();
         tvTurnButton = (RelativeLayout) findViewById(R.id.tvTurnButton);
         cameraObj = Camera.open();
-        if(packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
             tvTurnButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    if (mInterstitialAd.isLoaded()) {
+                        mInterstitialAd.show();
+                    }
                     if (isOn) {
                         isOn = false;
                         Camera.Parameters cameraParams = cameraObj.getParameters();
@@ -61,8 +92,8 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-        }else{
-            Toast.makeText(this,"Your device doesn't support camera flash",Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Your device doesn't support camera flash", Toast.LENGTH_LONG).show();
         }
     }
 
