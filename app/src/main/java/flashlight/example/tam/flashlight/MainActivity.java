@@ -1,6 +1,5 @@
-package com.example.tam.flashlight;
+package flashlight.example.tam.flashlight;
 
-import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -9,61 +8,19 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
+import com.startapp.android.publish.StartAppAd;
+import com.startapp.android.publish.StartAppSDK;
 
 public class MainActivity extends AppCompatActivity {
     RelativeLayout tvTurnButton;
     boolean isOn;
-    private AdView mAdView;
     private Camera cameraObj;
-//    InterstitialAd mInterstitialAd;
-
-//    private void requestNewInterstitial() {
-//        AdRequest adRequest = new AdRequest.Builder()
-//                .addTestDevice("SEE_YOUR_LOGCAT_TO_GET_YOUR_DEVICE_ID")
-//                .build();
-//
-//        mInterstitialAd.loadAd(adRequest);
-//    }
-
+    private StartAppAd startAppAd = new StartAppAd(this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StartAppSDK.init(this, "109802829", "209319874", true);
         setContentView(R.layout.activity_main);
-        // Gets the ad view defined in layout/ad_fragment.xml with ad unit ID set in
-        // values/strings.xml.
-//        interstital advs
-
-//        mInterstitialAd = new InterstitialAd(this);
-//        sample
-//        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-//        real
-//        mInterstitialAd.setAdUnitId("ca-app-pub-8770421762757862/3849421438");
-
-//        mInterstitialAd.setAdListener(new AdListener() {
-//            @Override
-//            public void onAdClosed() {
-//                requestNewInterstitial();
-//            }
-//        });
-//
-//        requestNewInterstitial();
-
-        //banner advs
-        mAdView = (AdView) findViewById(R.id.ad_view);
-
-        // Create an ad request. Check your logcat output for the hashed device ID to
-        // get test ads on a physical device. e.g.
-        // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-
-        // Start loading the ad in the background.
-        mAdView.loadAd(adRequest);
         final PackageManager packageManager = MainActivity.this.getPackageManager();
         tvTurnButton = (RelativeLayout) findViewById(R.id.tvTurnButton);
         cameraObj = Camera.open();
@@ -71,9 +28,6 @@ public class MainActivity extends AppCompatActivity {
             tvTurnButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    if (mInterstitialAd.isLoaded()) {
-//                        mInterstitialAd.show();
-//                    }
                     if (isOn) {
                         isOn = false;
                         Camera.Parameters cameraParams = cameraObj.getParameters();
@@ -99,9 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
         super.onDestroy();
 
     }
@@ -109,9 +60,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mAdView != null) {
-            mAdView.resume();
-        }
+        startAppAd.onResume();
         try {
             cameraObj = Camera.open();
         } catch (RuntimeException e) {
@@ -121,11 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        if (mAdView != null) {
-            mAdView.pause();
-        }
         super.onPause();
-
+        startAppAd.onPause();
     }
 
     @Override
