@@ -2,9 +2,11 @@ package flashlight.example.tam.flashlight;
 
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -13,8 +15,10 @@ import com.startapp.android.publish.StartAppSDK;
 
 public class MainActivity extends AppCompatActivity {
     RelativeLayout tvTurnButton;
+    ImageView imgFlash;
     boolean isOn;
-    private Camera cameraObj;
+    private CameraPreview mPreview;
+//    private Camera cameraObj;
     private StartAppAd startAppAd = new StartAppAd(this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,24 +27,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final PackageManager packageManager = MainActivity.this.getPackageManager();
         tvTurnButton = (RelativeLayout) findViewById(R.id.tvTurnButton);
-        cameraObj = Camera.open();
+        imgFlash = (ImageView) findViewById(R.id.imgFlash);
+//        cameraObj = Camera.open();
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
             tvTurnButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (isOn) {
                         isOn = false;
-                        Camera.Parameters cameraParams = cameraObj.getParameters();
-                        cameraParams.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                        cameraObj.setParameters(cameraParams);
-                        cameraObj.stopPreview();
+                        mPreview.mCamera.stopPreview();
+                        tvTurnButton.removeView(mPreview);
+                        onPreviewClose();
 
                     } else {
                         isOn = true;
-                        Camera.Parameters cameraParams = cameraObj.getParameters();
-                        cameraParams.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                        cameraObj.setParameters(cameraParams);
-                        cameraObj.startPreview();
+                        onPreviewOpen();
+                        createCameraPreview();
                     }
 
 
@@ -50,7 +52,14 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Your device doesn't support camera flash", Toast.LENGTH_LONG).show();
         }
     }
-
+    private void createCameraPreview() {
+        mPreview = new CameraPreview(this, 0, CameraPreview.LayoutMode.FitToParent);
+        RelativeLayout.LayoutParams previewLayoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        previewLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        tvTurnButton.addView(mPreview, 0, previewLayoutParams);
+//        mPreview.startCameraPreview();
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -62,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         startAppAd.onResume();
         try {
-            cameraObj = Camera.open();
+            mPreview.mCamera.startPreview();
+
         } catch (RuntimeException e) {
 
         }
@@ -77,9 +87,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
-        if (cameraObj != null) {
-            cameraObj.release();
+        if(mPreview.mCamera != null){
+            mPreview.mCamera.release();
         }
+//        if (cameraObj != null) {
+//            cameraObj.release();
+//        }
+    }
+    public void onPreviewOpen()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            tvTurnButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.black_background));
+        }
+        imgFlash.setVisibility(View.INVISIBLE);
+
+    }
+    public void onPreviewClose()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            tvTurnButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.back_ground_1));
+        }
+        imgFlash.setVisibility(View.VISIBLE);
     }
 }
